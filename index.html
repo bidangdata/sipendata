@@ -99,15 +99,22 @@
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12));
         }
 
-        .logo-bangka-hero {
-            width: 72px;
-            height: 72px;
+        .logo-dinas-nav {
+            width: 38px;
+            height: 38px;
             object-fit: contain;
-            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.28));
-            background: rgba(255,255,255,0.12);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.12));
+        }
+
+        .logo-bangka-hero {
+            width: 86px;
+            height: 86px;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 14px rgba(0,0,0,0.28));
+            background: #ffffff;
             padding: 6px;
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 18px;
+            border: 2px solid rgba(255,255,255,0.85);
         }
 
         .tagline-pill {
@@ -323,11 +330,17 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
         <div class="container">
             <a class="navbar-brand fw-bold text-primary d-flex align-items-center gap-2" href="#" onclick="switchView('dashboard'); return false;">
-                <img src="https://drive.google.com/thumbnail?id=19jN1Rmm3tZU4CJ-eFk0Eg6dLYv4WP1Q9&sz=w200" 
-                     alt="Logo Kabupaten Bangka" 
-                     class="logo-bangka-nav"
-                     onerror="if(this.src.indexOf('uc?export')===-1){this.src='https://drive.google.com/uc?export=view&id=19jN1Rmm3tZU4CJ-eFk0Eg6dLYv4WP1Q9';}else{this.src='https://placehold.co/80x80/1e3c72/ffffff?text=BANGKA';}">
-                <div class="lh-1">
+                <div class="d-flex align-items-center gap-1">
+                    <img src="https://drive.google.com/thumbnail?id=19jN1Rmm3tZU4CJ-eFk0Eg6dLYv4WP1Q9&sz=w200" 
+                         alt="Logo Kabupaten Bangka" 
+                         class="logo-bangka-nav"
+                         onerror="if(this.src.indexOf('uc?export')===-1){this.src='https://drive.google.com/uc?export=view&id=19jN1Rmm3tZU4CJ-eFk0Eg6dLYv4WP1Q9';}else{this.src='https://placehold.co/80x80/1e3c72/ffffff?text=BANGKA';}">
+                    <img src="https://drive.google.com/thumbnail?id=1EcxQVGWJIdM5V-mj3EHMLtpzGVbIsnrB&sz=w200" 
+                         alt="Logo DINPMP2KUKM Kabupaten Bangka" 
+                         class="logo-dinas-nav"
+                         onerror="if(this.src.indexOf('uc?export')===-1){this.src='https://drive.google.com/uc?export=view&id=1EcxQVGWJIdM5V-mj3EHMLtpzGVbIsnrB';}else{this.style.display='none';}">
+                </div>
+                <div class="lh-1 ms-1">
                     <span class="d-block fw-bold" style="font-size: 1.05rem; letter-spacing: -0.3px;">SI PENDATA</span>
                     <small class="text-muted fw-semibold d-block" style="font-size: 0.65rem;">DINPMP2KUKM Kab. Bangka</small>
                 </div>
@@ -375,10 +388,10 @@
     <section class="hero-section" id="hero-section">
         <div class="container text-center">
             <div class="d-flex flex-column align-items-center justify-content-center">
-                <img src="https://drive.google.com/thumbnail?id=19jN1Rmm3tZU4CJ-eFk0Eg6dLYv4WP1Q9&sz=w300" 
-                     alt="Logo Kabupaten Bangka" 
+                <img src="https://drive.google.com/thumbnail?id=1AWX1twcIUuTwMtpXBYrwebPFXTyuK1J4&sz=w400" 
+                     alt="Logo Aplikasi SI PENDATA DINPMP2KUKM Kabupaten Bangka" 
                      class="logo-bangka-hero mb-2"
-                     onerror="if(this.src.indexOf('uc?export')===-1){this.src='https://drive.google.com/uc?export=view&id=19jN1Rmm3tZU4CJ-eFk0Eg6dLYv4WP1Q9';}else{this.src='https://placehold.co/120x120/1e3c72/ffffff?text=KAB+BANGKA';}">
+                     onerror="if(this.src.indexOf('uc?export')===-1){this.src='https://drive.google.com/uc?export=view&id=1AWX1twcIUuTwMtpXBYrwebPFXTyuK1J4';}else{this.src='https://drive.google.com/thumbnail?id=19jN1Rmm3tZU4CJ-eFk0Eg6dLYv4WP1Q9&sz=w300';}">
                 <div class="mb-2">
                     <span class="tagline-pill"><i class="fas fa-bolt me-1"></i> "Buka Data Bangun Ekonomi Bangka"</span>
                 </div>
@@ -638,12 +651,13 @@
                                 <i class="fas fa-file-contract me-1"></i>Proyek Terbanyak
                             </button>
                             <button type="button" class="btn btn-outline-primary" id="btn-top5-investasi" onclick="setTop5Metric('investasi')">
-                                <i class="fas fa-coins me-1"></i>Investasi Terbesar
+                                <i class="fas fa-coins me-1"></i>Rencana Investasi Terbesar
                             </button>
                             <button type="button" class="btn btn-outline-primary" id="btn-top5-tki" onclick="setTop5Metric('tki')">
-                                <i class="fas fa-users me-1"></i>Penyerapan TKI
+                                <i class="fas fa-users me-1"></i>Rencana Penyerapan TKI
                             </button>
                         </div>
+                        <div id="top-sektor-active-info" class="d-none mb-2"></div>
                         <div id="top-sektor-list" class="d-flex flex-column gap-2"></div>
                     </div>
                 </div>
@@ -2485,6 +2499,20 @@
             UNFILTERED_TOP_SEKTOR_MAP = computeUnfilteredTopSektorMap(selectedTahun, selectedKec, selectedSkalaRatio, yearRatio);
 
             const hasKbliFilter = (checkedKblis.length > 0 || keyword !== '');
+            const checkedGroupKeySet = new Set();
+            checkedKblis.forEach(k => {
+                const p = extractKbliCodeAndCleanTitle(k);
+                checkedGroupKeySet.add(getKbliConsolidationKey(p.code, p.title));
+            });
+
+            const isSectorMatchingChecked = (sektorStr) => {
+                if (checkedKblis.length === 0) return true;
+                if (!sektorStr) return false;
+                if (checkedKblis.includes(sektorStr)) return true;
+                const p = extractKbliCodeAndCleanTitle(sektorStr);
+                const gk = getKbliConsolidationKey(p.code, p.title);
+                return checkedGroupKeySet.has(gk);
+            };
 
             // Hitung alokasi Kabupaten per Kecamatan untuk Skala terpilih secara presisi (0 selisih pembulatan)
             let countyKecMapForScope = {};
@@ -2549,7 +2577,7 @@
                 GLOBAL_DATA.rawList.forEach(item => {
                     const matchTahun = (selectedTahun === 'ALL' || !item.tahun || item.tahun === 'ALL' || String(item.tahun) === String(selectedTahun));
                     const matchSkala = (selectedSkala === 'ALL' || item.skala === 'ALL' || item.skala === selectedSkala);
-                    const matchChecked = checkedKblis.length > 0 ? checkedKblis.includes(item.sektor) : true;
+                    const matchChecked = isSectorMatchingChecked(item.sektor);
                     const formattedSektor = formatKbliWithCode(item.sektor || '').toLowerCase();
                     const matchText = (checkedKblis.length === 0 && keyword !== '')
                         ? (formattedSektor.includes(keyword) || (item.sektor || '').toLowerCase().includes(keyword) || (item.kecamatan || '').toLowerCase().includes(keyword) || (item.skala || '').toLowerCase().includes(keyword))
@@ -2581,12 +2609,6 @@
                 }
             }
 
-            BASELINE_SCOPE_TOTALS = {
-                totalProyek: countyBaselineProyek || GLOBAL_DATA.kpi.totalProyek || 1,
-                totalInvestasi: countyBaselineInv || GLOBAL_DATA.kpi.totalInvestasi || 1,
-                totalTKI: countyBaselineTKI || GLOBAL_DATA.kpi.totalTKI || 1
-            };
-
             let filteredKecamatan = {};
             let filteredSkala = {};
             let totalProyek = 0;
@@ -2598,7 +2620,7 @@
                     const matchTahun = (selectedTahun === 'ALL' || !item.tahun || item.tahun === 'ALL' || String(item.tahun) === String(selectedTahun));
                     const matchKec = (selectedKec === 'ALL' || item.kecamatan === selectedKec);
                     const matchSkala = (selectedSkala === 'ALL' || item.skala === 'ALL' || item.skala === selectedSkala);
-                    const matchChecked = checkedKblis.length > 0 ? checkedKblis.includes(item.sektor) : true;
+                    const matchChecked = isSectorMatchingChecked(item.sektor);
                     const formattedSektor = formatKbliWithCode(item.sektor || '').toLowerCase();
                     const matchText = (checkedKblis.length === 0 && keyword !== '')
                         ? (formattedSektor.includes(keyword) || (item.sektor || '').toLowerCase().includes(keyword) || (item.kecamatan || '').toLowerCase().includes(keyword) || (item.skala || '').toLowerCase().includes(keyword))
@@ -2629,6 +2651,48 @@
                     filteredKecamatan[item.kecamatan].investasi += invVal;
                     filteredKecamatan[item.kecamatan].tki += tkiVal;
                 });
+
+                // Fallback cerdas jika KBLI ada di Summary_KBLI (UNFILTERED_TOP_SEKTOR_MAP) namun belum tercatat di rawList
+                if (totalProyek === 0 && UNFILTERED_TOP_SEKTOR_MAP) {
+                    let fbProyek = 0, fbInv = 0, fbTki = 0;
+                    Object.keys(UNFILTERED_TOP_SEKTOR_MAP).forEach(sekKey => {
+                        const matchChecked = isSectorMatchingChecked(sekKey);
+                        const formattedSek = formatKbliWithCode(sekKey).toLowerCase();
+                        const matchText = (checkedKblis.length === 0 && keyword !== '')
+                            ? (formattedSek.includes(keyword) || sekKey.toLowerCase().includes(keyword))
+                            : true;
+                        if (matchChecked && matchText) {
+                            fbProyek += Number(UNFILTERED_TOP_SEKTOR_MAP[sekKey].proyek) || 0;
+                            fbInv += Number(UNFILTERED_TOP_SEKTOR_MAP[sekKey].investasi) || 0;
+                            fbTki += Number(UNFILTERED_TOP_SEKTOR_MAP[sekKey].tki) || 0;
+                        }
+                    });
+                    if (fbProyek > 0 || fbInv > 0) {
+                        const weightsP = {}, weightsI = {}, weightsT = {};
+                        const targetKecs = selectedKec === 'ALL' ? validKecKeys : [selectedKec];
+                        targetKecs.forEach(k => {
+                            weightsP[k] = Number(countyKecMapForScope[k]?.proyek) || 1;
+                            weightsI[k] = Number(countyKecMapForScope[k]?.investasi) || 1;
+                            weightsT[k] = Number(countyKecMapForScope[k]?.tki) || 1;
+                        });
+                        const distP = distributeIntegerExact(weightsP, fbProyek);
+                        const distI = distributeIntegerExact(weightsI, fbInv);
+                        const distT = distributeIntegerExact(weightsT, fbTki);
+                        targetKecs.forEach(k => {
+                            filteredKecamatan[k] = {
+                                proyek: distP[k] || 0,
+                                investasi: distI[k] || 0,
+                                tki: distT[k] || 0
+                            };
+                        });
+                        totalProyek = fbProyek;
+                        totalInvestasi = fbInv;
+                        totalTKI = fbTki;
+                        countyBaselineProyek = fbProyek;
+                        countyBaselineInv = fbInv;
+                        countyBaselineTKI = fbTki;
+                    }
+                }
 
                 if (selectedSkala === 'ALL') {
                     filteredSkala = distributeIntegerExact(baseSkalaMap, totalProyek);
@@ -2666,6 +2730,12 @@
                     filteredSkala = distributeIntegerExact(baseSkalaMap, totalProyek);
                 }
             }
+
+            BASELINE_SCOPE_TOTALS = {
+                totalProyek: countyBaselineProyek || totalProyek || GLOBAL_DATA.kpi.totalProyek || 1,
+                totalInvestasi: countyBaselineInv || totalInvestasi || GLOBAL_DATA.kpi.totalInvestasi || 1,
+                totalTKI: countyBaselineTKI || totalTKI || GLOBAL_DATA.kpi.totalTKI || 1
+            };
 
             const dynamicSummaryNIB = computeDynamicNIB(selectedTahun, selectedKec, selectedSkala, totalProyek, filteredSkala);
 
@@ -2839,10 +2909,13 @@
             const select = document.getElementById('filter-kecamatan');
             if (select.value === namaKec) {
                 select.value = 'ALL';
+                applyFilters();
+                showNotice('Filter wilayah dikembalikan ke seluruh Kecamatan Kabupaten Bangka.', 'primary');
             } else {
                 select.value = namaKec;
+                applyFilters();
+                showNotice(`Menampilkan filter wilayah: Kecamatan ${namaKec} (Klik sekali lagi atau tekan Reset untuk kembali).`, 'primary');
             }
-            applyFilters();
         }
 
         function renderDashboard(data) {
@@ -2931,10 +3004,19 @@
             });
 
             const insightEl = document.getElementById('executive-insight-text');
-            if (arrKecamatan.length > 0 && totInv > 0) {
+            if (arrKecamatan.length > 0 && (totInv > 0 || totProyek > 0)) {
                 const topSkalaEntry = Object.entries(data.skala || {}).sort((a, b) => b[1] - a[1])[0];
                 const topSkalaName = topSkalaEntry ? topSkalaEntry[0] : 'Usaha Mikro';
                 const tahunText = selectedTahun !== 'ALL' ? ` pada periode <b>Tahun ${selectedTahun}</b>` : '';
+                const selectedKbliGroups = getSelectedUnifiedKbliGroups();
+                const kwVal = (document.getElementById('filter-keyword')?.value || '').trim();
+                let kbliText = '';
+                if (selectedKbliGroups.length > 0) {
+                    const labels = selectedKbliGroups.map(g => g.displayLabel).join(', ');
+                    kbliText = ` khusus pada sektor KBLI <b>${escapeHtml(labels)}</b>`;
+                } else if (kwVal !== '') {
+                    kbliText = ` dengan kata kunci KBLI <b>"${escapeHtml(kwVal)}"</b>`;
+                }
 
                 if (selectedKecFilter !== 'ALL') {
                     const denomInv = BASELINE_SCOPE_TOTALS.totalInvestasi > 0 ? BASELINE_SCOPE_TOTALS.totalInvestasi : baseInv;
@@ -2942,12 +3024,12 @@
                     const kecShareInv = denomInv > 0 ? ((totInv / denomInv) * 100).toFixed(1) : '0.0';
                     const kecShareProyek = denomProyek > 0 ? ((totProyek / denomProyek) * 100).toFixed(1) : '0.0';
 
-                    insightEl.innerHTML = `<strong>Ringkasan Eksekutif SI PENDATA:</strong> Wilayah Kecamatan <b>${selectedKecFilter}</b>${tahunText} berkontribusi sebesar <b>${kecShareInv}%</b> (<b>${formatCompactRupiah(totInv)}</b>) terhadap total rencana investasi Kabupaten Bangka dan mencakup <b>${kecShareProyek}%</b> (<b>${formatNumber(totProyek)} proyek usaha/KBLI</b>) yang didominasi oleh <b>${topSkalaName}</b> dengan serapan <b>${formatNumber(totTKI)} tenaga kerja</b>.`;
+                    insightEl.innerHTML = `<strong>Ringkasan Eksekutif SI PENDATA:</strong> Wilayah Kecamatan <b>${selectedKecFilter}</b>${tahunText}${kbliText} berkontribusi sebesar <b>${kecShareInv}%</b> (<b>${formatCompactRupiah(totInv)}</b>) terhadap total rencana investasi cakupan Kabupaten Bangka dan mencakup <b>${kecShareProyek}%</b> (<b>${formatNumber(totProyek)} proyek usaha/KBLI</b>) yang didominasi oleh <b>${topSkalaName}</b> dengan rencana serapan <b>${formatNumber(totTKI)} tenaga kerja</b>.`;
                 } else {
-                    const topByInv = [...arrKecamatan].sort((a, b) => b.investasi - a.investasi)[0];
+                    const topByInv = [...arrKecamatan].sort((a, b) => (b.investasi - a.investasi) || (b.proyek - a.proyek))[0];
                     const topShare = totInv > 0 ? ((topByInv.investasi / totInv) * 100).toFixed(1) : '0.0';
 
-                    insightEl.innerHTML = `<strong>Ringkasan Eksekutif SI PENDATA:</strong> Wilayah <b>${topByInv.nama}</b> memimpin${tahunText} dengan kontribusi <b>${topShare}%</b> (<b>${formatCompactRupiah(topByInv.investasi)}</b>) dari total rencana investasi Kabupaten Bangka, didominasi oleh <b>${topSkalaName}</b> dengan total serapan <b>${formatNumber(totTKI)} tenaga kerja</b>.`;
+                    insightEl.innerHTML = `<strong>Ringkasan Eksekutif SI PENDATA:</strong> Wilayah <b>${topByInv.nama}</b> memimpin${tahunText}${kbliText} dengan kontribusi <b>${topShare}%</b> (<b>${formatCompactRupiah(topByInv.investasi)}</b>) dari total rencana investasi (<b>${formatCompactRupiah(totInv)}</b> • <b>${formatNumber(totProyek)} proyek</b>), didominasi oleh <b>${topSkalaName}</b> dengan total rencana serapan <b>${formatNumber(totTKI)} tenaga kerja</b>.`;
                 }
             } else {
                 insightEl.innerHTML = `<strong>Ringkasan Eksekutif SI PENDATA:</strong> Tidak ada data proyek yang cocok dengan kriteria pencarian saat ini. Silakan tekan tombol <b>Reset</b>.`;
@@ -3088,8 +3170,15 @@
                             const idx = elements[0].index;
                             const clickedSkala = labelsSkala[idx];
                             const skSelect = document.getElementById('filter-skala');
-                            skSelect.value = (skSelect.value === clickedSkala) ? 'ALL' : clickedSkala;
-                            applyFilters();
+                            if (skSelect.value === clickedSkala) {
+                                skSelect.value = 'ALL';
+                                applyFilters();
+                                showNotice('Filter skala usaha dikembalikan ke Semua Skala.', 'primary');
+                            } else {
+                                skSelect.value = clickedSkala;
+                                applyFilters();
+                                showNotice(`Menampilkan filter skala: ${clickedSkala} (Klik sekali lagi atau tekan Reset untuk kembali).`, 'primary');
+                            }
                         }
                     },
                     plugins: {
@@ -3142,6 +3231,12 @@
             const selectedTahun = document.getElementById('filter-tahun') ? document.getElementById('filter-tahun').value : 'ALL';
             const selectedKec = document.getElementById('filter-kecamatan') ? document.getElementById('filter-kecamatan').value : 'ALL';
             renderTop5Sektor(selectedKec, selectedTahun);
+            const modeNameMap = {
+                'proyek': 'Proyek Terbanyak',
+                'investasi': 'Rencana Investasi Terbesar',
+                'tki': 'Rencana Penyerapan TKI'
+            };
+            showNotice(`Menampilkan urutan Top 5 KBLI berdasarkan: ${modeNameMap[metric] || metric}.`, 'primary');
         }
 
         function getTop5SektorListFromAllData(sortByMetric = CURRENT_TOP5_METRIC) {
@@ -3243,6 +3338,7 @@
 
         function renderTop5Sektor(selectedKec, selectedTahun) {
             const container = document.getElementById('top-sektor-list');
+            const activeInfoEl = document.getElementById('top-sektor-active-info');
             const scopeBadge = document.getElementById('top-sektor-scope');
             let label = selectedKec === 'ALL' ? 'Kab. Bangka' : selectedKec;
             if (selectedTahun && selectedTahun !== 'ALL') label += ` (${selectedTahun})`;
@@ -3250,6 +3346,35 @@
 
             const activeMetric = CURRENT_TOP5_METRIC || 'proyek';
             const arrSektor = getTop5SektorListFromAllData(activeMetric);
+
+            // Tampilkan kotak keterangan aktif langsung di dalam kartu Top 5 KBLI apabila ada KBLI yang sedang dipilih
+            if (activeInfoEl) {
+                const selectedGroups = getSelectedUnifiedKbliGroups();
+                if (selectedGroups.length > 0 && CURRENT_FILTERED_DATA && CURRENT_FILTERED_DATA.kpi) {
+                    const labelsStr = selectedGroups.map(g => g.displayLabel).join(' + ');
+                    const curP = formatNumber(CURRENT_FILTERED_DATA.kpi.totalProyek || 0);
+                    const curInv = formatCompactRupiah(CURRENT_FILTERED_DATA.kpi.totalInvestasi || 0);
+                    const curTki = formatNumber(CURRENT_FILTERED_DATA.kpi.totalTKI || 0);
+                    activeInfoEl.className = 'alert alert-primary py-2 px-3 mb-2 small border-primary border-opacity-25 shadow-sm';
+                    activeInfoEl.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <div>
+                                <div class="fw-bold text-primary mb-1"><i class="fas fa-filter me-1"></i>Keterangan Filter KBLI Aktif:</div>
+                                <div class="fw-semibold text-dark mb-1">${escapeHtml(labelsStr)}</div>
+                                <div class="text-muted" style="font-size: 0.74rem;">
+                                    Total Cakupan: <b>${curP} Proyek</b> • Rencana Investasi: <b>${curInv}</b> • Rencana TKI: <b>${curTki} Orang</b>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-xs btn-outline-danger py-0 px-2 flex-shrink-0" style="font-size: 0.7rem;" onclick="clearSelectedKblis(event)" title="Hapus Filter KBLI">
+                                <i class="fas fa-times me-1"></i>Reset KBLI
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    activeInfoEl.className = 'd-none mb-2';
+                    activeInfoEl.innerHTML = '';
+                }
+            }
 
             if (arrSektor.length === 0) {
                 container.innerHTML = '<div class="text-muted small py-3 text-center">Data KBLI belum tersedia.</div>';
@@ -3276,27 +3401,32 @@
                 let subMetricSummary = '';
                 if (activeMetric === 'investasi') {
                     rightValueLabel = formatCompactRupiah(sek.investasi);
-                    subMetricSummary = `${formatNumber(sek.proyek)} Proyek • ${formatNumber(sek.tki)} TKI`;
+                    subMetricSummary = `${formatNumber(sek.proyek)} Proyek • Rencana ${formatNumber(sek.tki)} TKI`;
                 } else if (activeMetric === 'tki') {
                     rightValueLabel = `${formatNumber(sek.tki)} TKI`;
-                    subMetricSummary = `${formatNumber(sek.proyek)} Proyek • ${formatCompactRupiah(sek.investasi)}`;
+                    subMetricSummary = `${formatNumber(sek.proyek)} Proyek • Rencana ${formatCompactRupiah(sek.investasi)}`;
                 } else {
                     rightValueLabel = `${formatNumber(sek.proyek)} Proyek`;
-                    subMetricSummary = `${formatCompactRupiah(sek.investasi)} • ${formatNumber(sek.tki)} TKI`;
+                    subMetricSummary = `Rencana ${formatCompactRupiah(sek.investasi)} • ${formatNumber(sek.tki)} TKI`;
                 }
 
                 const div = document.createElement('div');
-                div.className = 'p-2 rounded bg-light border clickable-row ' + (isChecked ? 'selected-row' : '');
+                div.className = 'p-2 rounded bg-light border clickable-row ' + (isChecked ? 'selected-row border-primary' : '');
                 div.title = 'Klik untuk memfilter ' + sek.displayLabel;
                 div.onclick = () => {
                     if (isChecked) {
                         allKeys.forEach(k => SELECTED_KBLI_SET.delete(k));
+                        updateSelectedKbliBadge();
+                        renderKbliCheckboxes(document.getElementById('filter-keyword').value);
+                        applyFilters();
+                        showNotice(`Filter KBLI "${sek.displayLabel}" dinonaktifkan.`, 'primary');
                     } else {
                         allKeys.forEach(k => SELECTED_KBLI_SET.add(k));
+                        updateSelectedKbliBadge();
+                        renderKbliCheckboxes(document.getElementById('filter-keyword').value);
+                        applyFilters();
+                        showNotice(`Menampilkan filter KBLI: ${sek.displayLabel} (${formatNumber(sek.proyek)} Proyek • ${formatCompactRupiah(sek.investasi)} • ${formatNumber(sek.tki)} TKI). Klik sekali lagi untuk kembali.`, 'primary');
                     }
-                    updateSelectedKbliBadge();
-                    renderKbliCheckboxes(document.getElementById('filter-keyword').value);
-                    applyFilters();
                 };
 
                 const mergedSubHtml = sek.mergedNote
@@ -3305,11 +3435,15 @@
                        </div>`
                     : '';
 
+                const activeCheckBadge = isChecked
+                    ? `<span class="badge bg-primary ms-1" style="font-size: 0.65rem;"><i class="fas fa-check me-1"></i>Filter Aktif</span>`
+                    : '';
+
                 div.innerHTML = `
                     <div class="d-flex justify-content-between align-items-start small mb-1 gap-2">
                         <div class="pe-1" style="white-space: normal; word-break: break-word; flex: 1;">
                             <span class="fw-semibold" title="${escapeHtml(sek.displayLabel)}">
-                                <span class="badge ${theme.badge} me-1">${idx + 1}</span> ${escapeHtml(sek.displayLabel)}
+                                <span class="badge ${theme.badge} me-1">${idx + 1}</span> ${escapeHtml(sek.displayLabel)} ${activeCheckBadge}
                             </span>
                             <div class="text-muted mt-1" style="font-size: 0.71rem;">${subMetricSummary}</div>
                             ${mergedSubHtml}
@@ -4164,8 +4298,8 @@
 
             const arrSektor = getTop5SektorListFromAllData(CURRENT_TOP5_METRIC);
             const top5ModeLabel = CURRENT_TOP5_METRIC === 'investasi'
-                ? 'INVESTASI TERBESAR'
-                : (CURRENT_TOP5_METRIC === 'tki' ? 'PENYERAPAN TKI' : 'PROYEK TERBANYAK');
+                ? 'RENCANA INVESTASI TERBESAR'
+                : (CURRENT_TOP5_METRIC === 'tki' ? 'RENCANA PENYERAPAN TKI' : 'PROYEK TERBANYAK');
 
             let sektorLines = '';
             arrSektor.forEach((s, idx) => {
