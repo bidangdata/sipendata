@@ -4567,7 +4567,7 @@
             const adminNoteTxt = (t.adminNote || t.keteranganAdmin || '').toString().trim() || 'Permohonan sedang dalam tahap verifikasi oleh Admin Bidang Data dan Sistem Informasi DINPMP2KUKM Kabupaten Bangka.';
 
             // Gunakan URL Verifikasi Pendek (< 75 karakter) agar modul kotak QR Code berukuran besar, renggang, dan 100% langsung terbaca oleh semua kamera HP!
-            let baseVerifyUrl = 'https://mendata.dinpmp2kukm.bangka.go.id/';
+            let baseVerifyUrl = 'https://sipendata.dinpmp2kukm.bangka.go.id/';
             try {
                 if (window.location && window.location.protocol && window.location.protocol.startsWith('http')) {
                     baseVerifyUrl = window.location.origin + window.location.pathname;
@@ -4737,34 +4737,25 @@
             const labelInstansi = document.getElementById('label-instansi');
             const inputInstansi = document.getElementById('req-instansi');
             const noticeBox = document.getElementById('sop-kategori-notice');
-            const noticeText = document.getElementById('sop-kategori-notice-text');
+
+            // Sembunyikan kotak keterangan di layar utama agar bersih dan tidak membingungkan pemohon
+            if (noticeBox) noticeBox.style.display = 'none';
 
             if (kategori === 'Perorangan') {
-                labelUpload.innerHTML = 'Unggah KTP Pemohon (atau KTP + Surat Kuasa Sah) <span class="text-danger">*</span>';
-                hint.textContent = 'Format: PDF, JPG, PNG (Maks. 5MB). Wajib melampirkan foto/scan KTP asli.';
+                labelUpload.innerHTML = 'Unggah Foto / Scan KTP Asli <span class="text-danger">*</span>';
+                hint.textContent = 'Format: PDF, JPG, PNG (Maks. 5MB). Wajib melampirkan foto/scan KTP asli yang jelas dan terbaca.';
                 if (labelInstansi) labelInstansi.innerHTML = 'Pekerjaan / Profesi Pemohon <span class="text-danger">*</span>';
                 if (inputInstansi) inputInstansi.placeholder = 'Contoh: Wiraswasta / Peneliti Mandiri / Karyawan Swasta';
-                if (noticeBox && noticeText) {
-                    noticeBox.style.display = 'block';
-                    noticeText.innerHTML = '<i class="fas fa-shield-alt text-primary me-2"></i><b>Ketentuan SOP Kategori Perorangan:</b> Sesuai UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP) dan SOP Pelayanan Data Sektoral DINPMP2KUKM Kabupaten Bangka, pemohon Perorangan yang hanya melampirkan KTP <b>hanya dapat mengakses Data Sektoral Terbuka / Data Agregat</b> (rekapitulasi wilayah, skala usaha, dan KBLI). Permintaan data mikro spesifik per perusahaan (NIB/kontak/modal individu) wajib melampirkan <b>Surat Kuasa sah</b> dari pemilik usaha.';
-                }
             } else if (kategori === 'Akademisi / Peneliti') {
                 labelUpload.innerHTML = 'Unggah Surat Pengantar Kampus / Lembaga Riset <span class="text-danger">*</span>';
                 hint.textContent = 'Format: PDF, JPG, PNG (Maks. 5MB). Wajib melampirkan surat permohonan resmi dari Fakultas/Kampus/Lembaga Penelitian.';
                 if (labelInstansi) labelInstansi.innerHTML = 'Nama Perguruan Tinggi / Lembaga Riset <span class="text-danger">*</span>';
                 if (inputInstansi) inputInstansi.placeholder = 'Contoh: Universitas Bangka Belitung / Institut Pahlawan 12';
-                if (noticeBox && noticeText) {
-                    noticeBox.style.display = 'block';
-                    noticeText.innerHTML = '<i class="fas fa-graduation-cap text-primary me-2"></i><b>Ketentuan SOP Akademisi/Peneliti:</b> Permintaan Data Sektoral Terbuka (Agregat) diproses langsung maksimal 1 hari kerja. Apabila penelitian membutuhkan Data Mikro Terbatas, permohonan akan diverifikasi terlebih dahulu oleh Kepala Bidang / Kepala Dinas.';
-                }
             } else if (kategori) {
                 labelUpload.innerHTML = 'Unggah Surat Permohonan Resmi Berstempel <span class="text-danger">*</span>';
                 hint.textContent = 'Format: PDF, JPG, PNG (Maks. 5MB). Wajib melampirkan surat permohonan resmi berkop dan berstempel instansi/lembaga.';
                 if (labelInstansi) labelInstansi.innerHTML = 'Nama Instansi Pemerintah / Lembaga / Badan Usaha <span class="text-danger">*</span>';
                 if (inputInstansi) inputInstansi.placeholder = 'Contoh: Bappeda Kab. Bangka / BPS / Nama Perusahaan';
-                if (noticeBox) noticeBox.style.display = 'none';
-            } else {
-                if (noticeBox) noticeBox.style.display = 'none';
             }
         }
 
@@ -5086,23 +5077,23 @@
 
         let currentAdminPassword = '';
 
-        // 4 Templat Standar Keterangan Admin Sesuai SOP Pelayanan Data Sektoral (Bebas Istilah PPID)
+        // 4 Templat Standar Keterangan Admin Sesuai SOP Pelayanan Data Sektoral (Alur Verifikasi Kabid Data & Persetujuan Kadis)
         const SOP_ADMIN_RESPONSE_TEMPLATES = {
             'SETUJUI_AGREGAT': {
                 status: 'Selesai',
-                text: 'Permohonan Anda Selesai dan Disetujui. Sesuai komitmen pelayanan "Buka Data Bangun Ekonomi Bangka" dan UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP), silakan unduh dokumen rekapitulasi data sektoral yang Anda minta pada lampiran tiket ini. Terima kasih.'
-            },
-            'TOLAK_DATA_MIKRO_PERORANGAN': {
-                status: 'Ditolak',
-                text: 'Mohon maaf, permohonan Anda Ditolak. Rincian data mikro/spesifik perusahaan yang Anda minta merupakan Data Terbatas yang dilindungi berdasarkan UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP), Pasal 17 UU No. 14 Tahun 2008. Untuk mengakses data spesifik entitas, pemohon wajib melampirkan Surat Kuasa resmi dari pemilik usaha. Silakan ajukan permohonan kembali apabila Anda hanya memerlukan Data Sektoral Agregat/Rekapitulasi.'
-            },
-            'TOLAK_SYARAT_ADMIN': {
-                status: 'Ditolak',
-                text: 'Mohon maaf, permohonan Anda Ditolak. Dokumen persyaratan yang Anda unggah tidak terbaca/tidak memenuhi syarat administratif sesuai SOP Pelayanan Permintaan Data Sektoral DINPMP2KUKM Kabupaten Bangka. Silakan ajukan permohonan ulang dengan melampirkan pindaian KTP asli yang jelas (untuk perorangan) atau Surat Permohonan Resmi berstempel (untuk instansi/akademisi).'
+                text: 'Permohonan Anda telah Selesai dan Disetujui. Sesuai komitmen pelayanan "Buka Data Bangun Ekonomi Bangka", silakan unduh dokumen rekapitulasi data sektoral yang Anda minta pada lampiran tiket ini. Terima kasih.'
             },
             'ESKALASI_PIMPINAN': {
                 status: 'Diproses',
-                text: 'Permohonan Anda sedang Diproses. Mengingat data sektoral yang diminta bersifat rincian spesifik untuk keperluan kelembagaan/penelitian, permohonan Anda sedang dalam tahap verifikasi dan persetujuan Pimpinan (Kepala Bidang Data dan Sistem Informasi / Kepala DINPMP2KUKM Kabupaten Bangka). Silakan cek kembali status tiket Anda secara berkala.'
+                text: 'Permohonan Anda sedang Diproses. Mengingat data yang diminta berkaitan dengan rincian spesifik perusahaan/data mikro, permohonan Anda sedang dalam tahap Verifikasi Kepala Bidang Data dan Sistem Informasi serta Persetujuan Kepala DINPMP2KUKM Kabupaten Bangka. Silakan cek kembali status tiket Anda secara berkala.'
+            },
+            'TOLAK_SYARAT_ADMIN': {
+                status: 'Ditolak',
+                text: 'Mohon maaf, permohonan Anda Ditolak karena dokumen persyaratan yang diunggah tidak terbaca atau belum memenuhi syarat formil sesuai SOP Pelayanan Permintaan Data Sektoral DINPMP2KUKM Kabupaten Bangka. Silakan ajukan permohonan ulang dengan melampirkan Foto/Scan KTP asli yang jelas (untuk Perorangan) atau Surat Permohonan Resmi berstempel (untuk Instansi/Akademisi).'
+            },
+            'TOLAK_DATA_MIKRO_PERORANGAN': {
+                status: 'Ditolak',
+                text: 'Mohon maaf, permohonan Anda Ditolak. Berdasarkan hasil verifikasi dan mengacu pada UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP) serta Pasal 17 UU No. 14 Tahun 2008, rincian data spesifik perusahaan/data pribadi yang Anda minta merupakan informasi yang dikecualikan/dilindungi. Silakan ajukan permohonan kembali apabila Anda memerlukan Data Rekapitulasi Umum.'
             }
         };
 
@@ -5245,10 +5236,10 @@
                     <td>
                         <select class="form-select form-select-sm mb-1 bg-light text-primary fw-semibold" style="font-size:0.73rem;" onchange="applyAdminSopTemplate(${r.rowIndex}, this.value); this.value='';">
                             <option value="">⚡ Pilih Templat Jawaban SOP...</option>
-                            <option value="SETUJUI_AGREGAT">✅ Setujui (Data Sektoral Terbuka / Agregat)</option>
-                            <option value="TOLAK_DATA_MIKRO_PERORANGAN">❌ Tolak (Data Mikro/Pribadi Tanpa Surat Kuasa - UU PDP)</option>
-                            <option value="TOLAK_SYARAT_ADMIN">❌ Tolak (KTP Buram / Surat Tidak Valid)</option>
-                            <option value="ESKALASI_PIMPINAN">⏳ Diproses (Verifikasi Kabid / Kadis)</option>
+                            <option value="SETUJUI_AGREGAT">✅ Selesai Langsung (Data Terbuka / Rekapitulasi Umum)</option>
+                            <option value="ESKALASI_PIMPINAN">⏳ Diproses (Verifikasi Kabid Data &amp; Persetujuan Kadis)</option>
+                            <option value="TOLAK_SYARAT_ADMIN">❌ Tolak Formil (KTP Buram / Surat Tidak Sesuai)</option>
+                            <option value="TOLAK_DATA_MIKRO_PERORANGAN">❌ Tolak Hasil Verifikasi (Data Spesifik / UU PDP)</option>
                         </select>
                         <textarea class="form-control form-control-sm" id="adm-note-${r.rowIndex}" rows="3" placeholder="Ketik keterangan/catatan untuk pemohon...">${escapeHtml(r.adminNote || '')}</textarea>
                     </td>
