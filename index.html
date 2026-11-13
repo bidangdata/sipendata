@@ -1655,9 +1655,12 @@
             const formatted = formatKbliWithCode(rawKbliName);
             const m = formatted.match(/^\[([0-9a-zA-Z\/\s\-_]+)\]\s*(.*)$/);
             if (m) {
-                return { code: m[1].trim(), title: m[2].trim(), formatted: formatted };
+                const rawCodePart = m[1].trim();
+                const cleanTitlePart = m[2].trim().replace(/\s+/g, ' ');
+                // Normalisasi jika ada kode komposit seperti "10431 / 10431v2025" agar kode dasarnya seragam
+                return { code: rawCodePart, title: cleanTitlePart, formatted: formatted };
             }
-            return { code: '', title: formatted, formatted: formatted };
+            return { code: '', title: formatted.replace(/\s+/g, ' ').trim(), formatted: formatted };
         }
 
         // Data Fallback Realisasi LKPM (5.732 Laporan = Rp 18,85 Triliun, 10.568 TKI)
@@ -1989,10 +1992,13 @@
         // zodat Filter KBLI dan Top 5 KBLI Unggulan 100% sinkron serta otomatis mendukung data baru OSS
         function getAllAvailableKbliList() {
             const kbliMap = {};
+            const coveredGroupsFromSektor = new Set();
             if (GLOBAL_DATA && GLOBAL_DATA.sektor) {
                 for (let s in GLOBAL_DATA.sektor) {
                     if (s && s !== 'undefined' && s !== 'Lainnya') {
                         kbliMap[s] = Number(GLOBAL_DATA.sektor[s].proyek) || 0;
+                        const p = extractKbliCodeAndCleanTitle(s);
+                        coveredGroupsFromSektor.add(getKbliConsolidationKey(p.code, p.title));
                     }
                 }
             }
@@ -2000,7 +2006,10 @@
                 GLOBAL_DATA.rawList.forEach(r => {
                     const s = (r.sektor || '').toString().trim();
                     if (s && s !== 'undefined' && s !== 'Lainnya' && kbliMap[s] === undefined) {
-                        kbliMap[s] = Number(r.proyek) || 1;
+                        const p = extractKbliCodeAndCleanTitle(s);
+                        const gk = getKbliConsolidationKey(p.code, p.title);
+                        // Jika grup KBLI sudah ada di GLOBAL_DATA.sektor, daftarkan variasinya dengan proyek 0 agar tidak terhitung ganda (double count)
+                        kbliMap[s] = coveredGroupsFromSektor.has(gk) ? 0 : (Number(r.proyek) || 1);
                     }
                 });
             }
@@ -2054,10 +2063,16 @@
 
                 if (group.variants.length > 1) {
                     const uniqueCodes = [];
-                    if (mainCode) uniqueCodes.push(mainCode);
-                    group.variants.forEach(v => {
-                        if (v.code && !uniqueCodes.includes(v.code)) uniqueCodes.push(v.code);
-                    });
+                    const addCodeTokens = (cStr) => {
+                        if (!cStr) return;
+                        cStr.split('/').map(s => s.trim()).filter(Boolean).forEach(tok => {
+                            if (!uniqueCodes.some(u => u.toLowerCase() === tok.toLowerCase())) {
+                                uniqueCodes.push(tok);
+                            }
+                        });
+                    };
+                    addCodeTokens(mainCode);
+                    group.variants.forEach(v => addCodeTokens(v.code));
                     const codeCombo = uniqueCodes.join(' / ');
                     const legacyTitles = group.variants
                         .map(v => v.title)
@@ -2070,8 +2085,11 @@
                         displayLabel = `[${codeCombo}] ${mainTitle}`;
                     }
 
-                    const parts = group.variants.map(v => `${v.formatted} (${formatNumber(v.proyek)})`);
-                    mergedSubNote = `Gabungan Otomatis: ${parts.join(' + ')}`;
+                    const nonZeroVariants = group.variants.filter(v => v.proyek > 0);
+                    if (nonZeroVariants.length > 1) {
+                        const parts = nonZeroVariants.map(v => `${v.formatted} (${formatNumber(v.proyek)})`);
+                        mergedSubNote = `Gabungan Otomatis: ${parts.join(' + ')}`;
+                    }
                 }
 
                 const searchBlob = [
@@ -3197,27 +3215,49 @@
         }
 
         function getKbliConsolidationKey(codeStr, titleStr) {
-            const c = (codeStr || '').toLowerCase().trim();
-            const t = (titleStr || '').toLowerCase().trim();
-            if (KBLI_CONVERSION_GROUP_MAP[c]) {
-                return KBLI_CONVERSION_GROUP_MAP[c].groupKey;
+            const rawC = (codeStr || '').toLowerCase().trim();
+            const t = (titleStr || '').toLowerCase().replace(/\s+/g, ' ').trim();
+
+            // 1. Pecah jika kode mengandung garis miring "/" (contoh: "10431 / 10431v2025" atau "01262 / 0126v2025")
+            const codeTokens = rawC.split('/').map(s => s.trim()).filter(Boolean);
+
+            for (let tok of codeTokens) {
+                if (KBLI_CONVERSION_GROUP_MAP[tok]) {
+                    return KBLI_CONVERSION_GROUP_MAP[tok].groupKey;
+                }
             }
-            // Deteksi otomatis apabila judul sama persis kecuali pergantian istilah "Perkebunan (Buah) X" <-> "Pertanian X"
+            if (KBLI_CONVERSION_GROUP_MAP[rawC]) {
+                return KBLI_CONVERSION_GROUP_MAP[rawC].groupKey;
+            }
+
+            // 2. Deteksi otomatis apabila judul sama persis kecuali pergantian istilah "Perkebunan (Buah) X" <-> "Pertanian X"
             const coreCommodity = t
                 .replace(/^(perkebunan\s+buah\s+|perkebunan\s+|pertanian\s+buah\s+|pertanian\s+)/i, '')
                 .trim();
-            if (coreCommodity && (t.startsWith('perkebunan') || t.startsWith('pertanian')) && c.startsWith('012')) {
+            if (coreCommodity && (t.startsWith('perkebunan') || t.startsWith('pertanian')) && rawC.startsWith('012')) {
                 return 'CONV_AGRI_' + coreCommodity;
             }
-            // Jika kode 5 digit + v2025 (misal 47111v2025 dan 47111)
-            const baseDigits = c.replace(/v20\d{2}.*$/, '');
-            if (/^\d{5}$/.test(baseDigits)) {
-                return 'CODE5_' + baseDigits;
+
+            // 3. Jika token kode (baik tunggal "10431v2025" maupun gabungan "10431 / 10431v2025") memiliki 5 digit dasar yang sama -> satukan ke CODE5_<5digit>!
+            for (let tok of codeTokens) {
+                const baseDigits = tok.replace(/v20\d{2}.*$/, '').replace(/[^0-9]/g, '');
+                if (/^\d{5}$/.test(baseDigits)) {
+                    return 'CODE5_' + baseDigits;
+                }
             }
-            if (/^\d{4}v20\d{2}$/.test(c)) {
-                return 'CODE4V_' + c;
+
+            for (let tok of codeTokens) {
+                if (/^\d{4}v20\d{2}$/.test(tok)) {
+                    return 'CODE4V_' + tok;
+                }
             }
-            return 'RAW_' + (c ? c + '_' : '') + t;
+
+            // 4. Jika judul sektor sama persis (contoh sama-sama "industri minyak mentah kelapa sawit (crude palm oil)"), satukan berdasarkan judul!
+            if (t.length >= 6) {
+                return 'TITLE_' + t;
+            }
+
+            return 'RAW_' + (rawC ? rawC + '_' : '') + t;
         }
 
         function setTop5Metric(metric) {
