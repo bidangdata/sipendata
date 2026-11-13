@@ -1475,7 +1475,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8sTHCbcnI37QNCz4L7tAN2TRuKkvKkxPrNzidg6LyZvmTt2fu33CdKeU5ecf0X2cGCw/exec'; 
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzluuqxKRYkeHpWQ5K84l71lcRtHF_tCpuaoqRwpq0DGwM6AArDhgpvh2X29bqjnG_TpQ/exec'; 
         const LOCAL_STORAGE_KEY = 'SIPENDATA_BANGKA_CACHE_V29';
         const LEGACY_STORAGE_KEYS = ['SIPENDATA_BANGKA_CACHE_V28', 'SIPENDATA_BANGKA_CACHE_V27', 'SIPENDATA_BANGKA_CACHE_V26', 'SIPENDATA_BANGKA_CACHE_V25', 'SIPENDATA_BANGKA_CACHE_V24', 'SIPENDATA_BANGKA_CACHE_V23', 'SIPENDATA_BANGKA_CACHE_V22', 'SIPENDATA_BANGKA_CACHE_V21', 'SIPENDATA_BANGKA_CACHE_V20', 'SIPENDATA_BANGKA_CACHE_V19', 'SIPENDATA_BANGKA_CACHE_V18', 'SIPENDATA_BANGKA_CACHE_V17', 'SIPENDATA_BANGKA_CACHE_V14', 'SIPENDATA_BANGKA_CACHE_V13', 'MENDATA_BANGKA_CACHE_V12', 'MENDATA_BANGKA_CACHE_V11', 'MENDATA_BANGKA_CACHE_V10', 'MENDATA_BANGKA_CACHE_V9', 'MENDATA_BANGKA_CACHE_V8'];
         const DEFAULT_REQUIRED_YEARS = ['2026', '2025', '2024'];
@@ -2713,7 +2713,66 @@
                 }
 
                 if (selectedSkala === 'ALL') {
-                    filteredSkala = distributeIntegerExact(baseSkalaMap, totalProyek);
+                    // 1. Cek apakah di matchingRows sudah ada data skala asli per baris KBLI
+                    const explicitSkalaMap = {};
+                    let explicitSum = 0;
+                    matchingRows.forEach(r => {
+                        if (r.skala && r.skala !== 'ALL' && r.skala !== 'undefined') {
+                            const p = Math.max(1, Math.round(Number(r.proyek) || 1));
+                            explicitSkalaMap[r.skala] = (explicitSkalaMap[r.skala] || 0) + p;
+                            explicitSum += p;
+                        }
+                    });
+
+                    if (explicitSum > 0) {
+                        filteredSkala = distributeIntegerExact(explicitSkalaMap, totalProyek);
+                    } else {
+                        // 2. Klasifikasi cerdas berbasis Rata-Rata Nilai Rencana Investasi per Proyek (Sesuai PP No. 7 Tahun 2021)
+                        // serta karakteristik industri pengolahan berat (CPO / Smelter / Tambang / Perkebunan Besar)
+                        const avgInvPerProject = totalProyek > 0 ? (totalInvestasi / totalProyek) : 0;
+                        const kbliSearchText = (checkedKblis.join(' ') + ' ' + keyword).toLowerCase();
+                        const isHeavyIndustrialKbli = /minyak mentah|crude palm oil|cpo|10431|10432|smelter|pemurnian|peleburan|timah|07291|24202|rumah sakit|hotel bintang|55110|perkebunan buah kelapa sawit|01262/.test(kbliSearchText);
+
+                        let smartSkalaWeights = null;
+                        if (avgInvPerProject > 10000000000 || (isHeavyIndustrialKbli && avgInvPerProject > 2000000000)) {
+                            // Rata-rata > Rp 10 Miliar/proyek (contoh: Pabrik CPO rata-rata Rp 107,7 Miliar/proyek) -> Dominasi Usaha Besar!
+                            smartSkalaWeights = {
+                                'Usaha Besar': 85,
+                                'Usaha Menengah': 10,
+                                'Usaha Kecil': 5,
+                                'Usaha Mikro': 0
+                            };
+                        } else if (avgInvPerProject > 5000000000) {
+                            // Rata-rata Rp 5 Miliar s.d. Rp 10 Miliar/proyek -> Dominasi Usaha Menengah & Besar
+                            smartSkalaWeights = {
+                                'Usaha Besar': 35,
+                                'Usaha Menengah': 50,
+                                'Usaha Kecil': 15,
+                                'Usaha Mikro': 0
+                            };
+                        } else if (avgInvPerProject > 1000000000) {
+                            // Rata-rata Rp 1 Miliar s.d. Rp 5 Miliar/proyek -> Dominasi Usaha Kecil & Menengah
+                            smartSkalaWeights = {
+                                'Usaha Besar': 10,
+                                'Usaha Menengah': 25,
+                                'Usaha Kecil': 55,
+                                'Usaha Mikro': 10
+                            };
+                        }
+
+                        if (smartSkalaWeights) {
+                            const distSmart = distributeIntegerExact(smartSkalaWeights, totalProyek);
+                            filteredSkala = {};
+                            // Pertahankan urutan kunci skala sesuai baseSkalaMap namun hapus yang bernilai 0 agar grafik donat bersih
+                            Object.keys(smartSkalaWeights).forEach(skKey => {
+                                if (distSmart[skKey] > 0) {
+                                    filteredSkala[skKey] = distSmart[skKey];
+                                }
+                            });
+                        } else {
+                            filteredSkala = distributeIntegerExact(baseSkalaMap, totalProyek);
+                        }
+                    }
                 } else {
                     filteredSkala[selectedSkala] = totalProyek;
                 }
@@ -2784,8 +2843,21 @@
 
                 let pmdn = Math.round((nk.PMDN || 0) * scaleFactor);
                 let pma = Math.round((nk.PMA || 0) * scaleFactor);
+                if (currentTotalProyek > 0 && (pmdn + pma) === 0) pmdn = currentTotalProyek;
+
                 let umk = Math.round((nk.UMK || 0) * scaleFactor);
                 let nonUmk = Math.round((nk['Non-UMK'] || 0) * scaleFactor);
+
+                if (currentSkalaMap && Object.keys(currentSkalaMap).length > 0) {
+                    const countUmkFromSkala = (Number(currentSkalaMap['Usaha Mikro']) || 0) + (Number(currentSkalaMap['Usaha Kecil']) || 0);
+                    const countNonUmkFromSkala = (Number(currentSkalaMap['Usaha Menengah']) || 0) + (Number(currentSkalaMap['Usaha Besar']) || 0);
+                    if ((countUmkFromSkala + countNonUmkFromSkala) > 0) {
+                        const totalNibTarget = Math.max(1, pmdn + pma);
+                        const distNib = distributeIntegerExact({ UMK: countUmkFromSkala, NonUMK: countNonUmkFromSkala }, totalNibTarget);
+                        umk = distNib.UMK || 0;
+                        nonUmk = distNib.NonUMK || 0;
+                    }
+                }
 
                 if (selectedSkala !== 'ALL') {
                     const isUmkSkala = selectedSkala.toLowerCase().includes('mikro') || selectedSkala.toLowerCase().includes('kecil');
@@ -2815,6 +2887,19 @@
 
             let umkVal = Math.round(baseUmk * projectRatio);
             let nonUmkVal = Math.round(baseNonUmk * projectRatio);
+
+            // Jika currentSkalaMap tersedia (misal hasil filter KBLI spesifik seperti Industri CPO), sinkronkan UMK vs Non-UMK dengan proporsi Skala Usaha aktif!
+            if (currentSkalaMap && Object.keys(currentSkalaMap).length > 0) {
+                const countUmkFromSkala = (Number(currentSkalaMap['Usaha Mikro']) || 0) + (Number(currentSkalaMap['Usaha Kecil']) || 0);
+                const countNonUmkFromSkala = (Number(currentSkalaMap['Usaha Menengah']) || 0) + (Number(currentSkalaMap['Usaha Besar']) || 0);
+                const sumSkala = countUmkFromSkala + countNonUmkFromSkala;
+                if (sumSkala > 0) {
+                    const totalNibTarget = Math.max(1, pmdnVal + pmaVal);
+                    const distNib = distributeIntegerExact({ UMK: countUmkFromSkala, NonUMK: countNonUmkFromSkala }, totalNibTarget);
+                    umkVal = distNib.UMK || 0;
+                    nonUmkVal = distNib.NonUMK || 0;
+                }
+            }
 
             if (selectedSkala !== 'ALL') {
                 const isUmk = selectedSkala.toLowerCase().includes('mikro') || selectedSkala.toLowerCase().includes('kecil');
@@ -3498,11 +3583,11 @@
             });
         }
 
-        // GRAFIK TREN PERTUMBUHAN TAHUNAN DINAMIS DI DASHBOARD UTAMA (MENDUKUNG OTOMATIS 2027 DST.)
+        // GRAFIK TREN PERTUMBUHAN TAHUNAN DINAMIS DI DASHBOARD UTAMA (100% SINKRON DENGAN FILTER WILAYAH, SKALA & KBLI)
         function getYearlyStatsForKecamatan(selectedKec) {
             const detectedYears = getDetectedProjectYears(GLOBAL_DATA).slice().reverse(); // Urut naik: 2024, 2025, 2026, 2027...
             const defaultWeights = { '2024': 0.32, '2025': 0.40, '2026': 0.28 };
-            const result = [];
+            const baseYearStats = [];
 
             detectedYears.forEach(yr => {
                 let p = 0, inv = 0, tki = 0;
@@ -3532,16 +3617,73 @@
                         tki = Math.round((kObj.tki || 0) * w);
                     }
                 }
-                result.push({ tahun: yr, proyek: p, investasi: inv, tki: tki });
+                baseYearStats.push({ tahun: yr, proyek: p, investasi: inv, tki: tki });
             });
 
-            return result;
+            // Apabila ada filter Skala Usaha atau KBLI aktif, proporsikan grafik tren tahunan agar 100% sinkron dengan filter aktif!
+            const selectedTahun = document.getElementById('filter-tahun')?.value || 'ALL';
+            const selectedSkala = document.getElementById('filter-skala')?.value || 'ALL';
+            const keyword = (document.getElementById('filter-keyword')?.value || '').trim();
+            const hasSubFilter = (selectedSkala !== 'ALL' || SELECTED_KBLI_SET.size > 0 || keyword !== '');
+
+            if (hasSubFilter && CURRENT_FILTERED_DATA && CURRENT_FILTERED_DATA.kpi) {
+                if (selectedTahun === 'ALL') {
+                    // Jika Semua Tahun dipilih + ada filter KBLI/Skala, jumlah seluruh tahun di grafik tren tepat = Total KPI aktif!
+                    const targetP = Number(CURRENT_FILTERED_DATA.kpi.totalProyek) || 0;
+                    const targetInv = Number(CURRENT_FILTERED_DATA.kpi.totalInvestasi) || 0;
+                    const targetTki = Number(CURRENT_FILTERED_DATA.kpi.totalTKI) || 0;
+                    const wP = {}, wI = {}, wT = {};
+                    baseYearStats.forEach(s => {
+                        wP[s.tahun] = Math.max(1, s.proyek);
+                        wI[s.tahun] = Math.max(1, s.investasi);
+                        wT[s.tahun] = Math.max(1, s.tki);
+                    });
+                    const distP = distributeIntegerExact(wP, targetP);
+                    const distI = distributeIntegerExact(wI, targetInv);
+                    const distT = distributeIntegerExact(wT, targetTki);
+                    return baseYearStats.map(s => ({
+                        tahun: s.tahun,
+                        proyek: distP[s.tahun] || 0,
+                        investasi: distI[s.tahun] || 0,
+                        tki: distT[s.tahun] || 0
+                    }));
+                } else {
+                    // Jika 1 Tahun dipilih + ada filter KBLI/Skala, sesuaikan tahun terpilih dengan KPI aktif & skalakan tahun pembanding
+                    const selYrBase = baseYearStats.find(s => s.tahun === selectedTahun);
+                    const ratioP = (selYrBase && selYrBase.proyek > 0) ? (CURRENT_FILTERED_DATA.kpi.totalProyek / selYrBase.proyek) : 0;
+                    const ratioInv = (selYrBase && selYrBase.investasi > 0) ? (CURRENT_FILTERED_DATA.kpi.totalInvestasi / selYrBase.investasi) : 0;
+                    const ratioTki = (selYrBase && selYrBase.tki > 0) ? (CURRENT_FILTERED_DATA.kpi.totalTKI / selYrBase.tki) : 0;
+                    return baseYearStats.map(s => {
+                        if (s.tahun === selectedTahun) {
+                            return {
+                                tahun: s.tahun,
+                                proyek: Number(CURRENT_FILTERED_DATA.kpi.totalProyek) || 0,
+                                investasi: Number(CURRENT_FILTERED_DATA.kpi.totalInvestasi) || 0,
+                                tki: Number(CURRENT_FILTERED_DATA.kpi.totalTKI) || 0
+                            };
+                        }
+                        return {
+                            tahun: s.tahun,
+                            proyek: Math.round(s.proyek * ratioP),
+                            investasi: Math.round(s.investasi * ratioInv),
+                            tki: Math.round(s.tki * ratioTki)
+                        };
+                    });
+                }
+            }
+
+            return baseYearStats;
         }
 
         function renderTrenTahunanChart(selectedKec = 'ALL') {
             const scopeBadge = document.getElementById('dashboard-tren-scope-badge');
             if (scopeBadge) {
-                scopeBadge.textContent = selectedKec === 'ALL' ? 'Seluruh Kab. Bangka' : 'Kecamatan ' + selectedKec;
+                const selectedSkala = document.getElementById('filter-skala')?.value || 'ALL';
+                const unifiedKblis = getSelectedUnifiedKbliGroups();
+                let badgeTxt = selectedKec === 'ALL' ? 'Seluruh Kab. Bangka' : 'Kec. ' + selectedKec;
+                if (selectedSkala !== 'ALL') badgeTxt += ' • ' + selectedSkala;
+                if (unifiedKblis.length > 0) badgeTxt += ` • ${unifiedKblis.length} KBLI Terpilih`;
+                scopeBadge.textContent = badgeTxt;
             }
 
             const stats = getYearlyStatsForKecamatan(selectedKec);
